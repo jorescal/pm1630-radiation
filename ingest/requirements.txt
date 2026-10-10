@@ -1,0 +1,4 @@
+Flask>=3.0,<4
+gunicorn>=22,<24
+google-cloud-pubsub>=2.21,<3
+google-cloud-firestore>=2.16,<3

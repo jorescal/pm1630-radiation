@@ -1,0 +1,22 @@
+[Unit]
+Description=PM1630 lab -> GCP bridge (MQTT -> Cloud Run pm1630-ingest)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=pm1630bridge
+Group=pm1630bridge
+EnvironmentFile=/etc/pm1630-bridge/bridge.env
+ExecStart=/opt/pm1630-bridge/venv/bin/python -u /opt/pm1630-bridge/pm1630_bridge.py
+Restart=always
+RestartSec=15
+StateDirectory=pm1630-bridge
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+PrivateTmp=true
+ReadWritePaths=/var/lib/pm1630-bridge
+
+[Install]
+WantedBy=multi-user.target
