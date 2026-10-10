@@ -21,8 +21,7 @@ feed a real-time dashboard. A mobile app for worn units is planned.
 | `bridge/` | `gcp-bridge` LXC service (MQTT → Cloud Run), written, not yet deployed |
 | `ingest/` | Cloud Run `pm1630-ingest` (deployed 2026-10-08) |
 | `tools/meraki_inventory.py` | Read-only Meraki Dashboard API inventory |
-| `claude/project-instructions.md` | Instructions currently active in the Claude Project |
-| `claude/project-instructions-pending.md` | 2026-09-26 rewrite, **not yet pasted** into the Claude Project |
+| `claude/project-instructions.md` | Full text of the Claude Project instructions (2026-10-10 refresh plus a repository/sync section). Paste it as a full replacement. |
 | `CHANGELOG.md` | Every change to this section |
 
 ## Interface with the hub
