@@ -191,7 +191,7 @@ No broker/ACL change is needed on the homelab side for this — the `pm1630` mos
 ### Architecture
 
 ```
-pi-pm1630 ─MQTT─▶ homelab broker ◀─MQTT─ MR33s (homelab/telemetry/ble/meraki)
+pi-pm1630 ─MQTT─▶ homelab broker ◀─MQTT─ Aparta MR33 (homelab/telemetry/ble/meraki)
                         │  read-only MQTT user "gcp-bridge"
                   gcp-bridge (new Proxmox LXC, VLAN 30 — homelab provisions, this project owns the service)
                    ├─ every 60 s: one summary per device
@@ -422,7 +422,7 @@ Design decisions recorded 2026-09-26. Nothing built. Next: the Meraki homelab ve
 
 ### 1. Hardware reality check
 
-| | **MR33** (×2, Site A) | **MR18** |
+| | **MR33** (Aparta AP, Site A · AP Pool JoTe at Quinta JoTe, likely MR33 — confirm with `meraki_inventory.py`) | **MR18** (Rancho AP, Site A) |
 |---|---|---|
 | Wi-Fi | 802.11ac Wave 2, 2×2 | 802.11n, 2×2 |
 | Dedicated scanning radio | ✅ dual-band (WIDS/WIPS, spectrum, location analytics) | ✅ dual-band (WIPS/spectrum) |
@@ -434,9 +434,9 @@ Design decisions recorded 2026-09-26. Nothing built. Next: the Meraki homelab ve
 
 Consequences:
 
-- **The MR33s carry the whole design.** They are the only APs here that can see BLE at all. Past EoS they keep working and stay dashboard-manageable, but receive no more support or security patches — acceptable for the homelab POC, **not** something to present as a hospital deployment target.
-- **The MR18 has no role in positioning.** No BLE, stuck on MR 26 (below both MQTT's 28.x and Scanning API v3's 27.x floor). Keep it out of the Site A network that runs MQTT: Meraki's doc notes the MQTT option may not appear when a network contains non-supporting APs (move MQTT-capable APs to their own network if so). Useful only as Wi-Fi coverage / spare.
-- **2 APs is below Meraki's own 3-AP threshold.** Scanning API v3 and the dashboard Location Heatmap only compute x/y when a client is heard by ≥ 3 APs (firmware 26.1+); with 2 APs v3 returns only `nearestApMac`/`nearestApRssi`. So in the homelab the achievable result is nearest-AP / "closer to A or B" — enough to validate the pipeline, not positioning accuracy (for checkpoint entry/exit this doesn't matter).
+- **The MR33s carry the whole design** — one per site: Aparta AP at Site A and (likely) AP Pool JoTe at Quinta JoTe (corrected 2026-10-10; earlier text said 2× MR33 at Site A). They are the only APs here that can see BLE at all. Past EoS they keep working and stay dashboard-manageable, but receive no more support or security patches — acceptable for the homelab POC, **not** something to present as a hospital deployment target.
+- **The MR18 (Rancho AP) has no role in positioning.** No BLE, stuck on MR 26 (below both MQTT's 28.x and Scanning API v3's 27.x floor). It is in the same Site A network as the Aparta MR33; Meraki's doc notes the MQTT option may not appear when a network contains non-supporting APs, but MQTT streaming is already live from the Aparta MR33 (homelab 6.3a), so this hasn't blocked it. Useful only as Wi-Fi coverage.
+- **One BLE-capable AP per site is far below Meraki's 3-AP threshold.** Scanning API v3 and the dashboard Location Heatmap only compute x/y when a client is heard by ≥ 3 APs (firmware 26.1+); below that v3 returns only `nearestApMac`/`nearestApRssi`. With one MR33 per site the achievable result is **presence per site** (heard by Aparta = at Site A, heard by Pool AP = at Quinta JoTe) — no "closer to A or B" inside a site. Enough to validate the pipeline and checkpoint entry/exit, not positioning accuracy.
 
 ### 2. The three Meraki data paths — which does what
 
@@ -508,10 +508,10 @@ Not found in the API this pass: the IoT-radio **RSSI publisher** settings (topic
 - **Privacy:** Meraki's cloud hashes MACs for Location Analytics, but MQTT delivers **raw MACs** to the local broker — allow lists (§5) are the control that keeps it to project tags only. Staff location tracking still needs its own HR/legal/union sign-off, separate from the radiation-safety/biomed/IT-security review (see Privacy/HR flag above).
 - **Claims:** position estimates are coarse zone/dwell indicators layered over spot-validated (not calibrated) dose data — nothing here is clinically validated.
 
-### 8. Verification plan (homelab, 2× MR33)
+### 8. Verification plan (homelab: Aparta MR33 at Site A, AP Pool JoTe at Quinta JoTe)
 
 1. Run `meraki_inventory.py` (read-only) → confirm AP models/firmware, `scanningEnabled`/`advertisingEnabled`, existing broker config.
-2. **Beacon + scanning coexistence (critical for the app):** enable beacon advertising (Unique major/minor) on the Site A network while MQTT scanning stays on; at Site A, use a phone BLE scanner app (e.g. nRF Connect) to confirm each MR33 advertises an iBeacon with its own major/minor, **and** confirm `homelab/telemetry/ble/meraki` keeps flowing.
+2. **Beacon + scanning coexistence (critical for the app):** enable beacon advertising (Unique major/minor) on the Site A network while MQTT scanning stays on; at Site A, use a phone BLE scanner app (e.g. nRF Connect) to confirm the Aparta MR33 advertises an iBeacon with its own major/minor (repeat at Quinta JoTe for the Pool AP once its model is confirmed), **and** confirm `homelab/telemetry/ble/meraki` keeps flowing.
 3. Optional (lab cross-check only): `bluetoothctl info <MAC>` → `AddressType` on `pi-pm1630`, and the connected-vs-stopped MQTT capture for the PM1630's own advertising. No longer blocking.
 4. Then: app scaffolding — BLE collector + local alarms first, checkpoints second, map last.
 

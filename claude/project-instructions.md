@@ -27,7 +27,7 @@ The project originated inside the ONC HQ Lab homelab project and was split out 2
 - **Lab → GCP bridge:** `pm1630-bridge` service code written and tested locally; **not deployed** — waiting on a homelab LXC `gcp-bridge` (VLAN 30) and a read-only Mosquitto user `gcp-bridge`.
 - **Tooling:** `gcloud` installed on the Mac (account `{{OWNER_EMAIL}}`, default project `{{GCP_PROJECT_ID}}`); Cloud Shell also used.
 - **Measured caveat:** the device's cumulative dose is a float32 in Sv — at background it moves in lumps (~0.00006 µSv steps), so per-second counter deltas are unusable at background levels; 60 s windows are fine.
-- **Meraki (lab):** Site A has 2× MR33 (BLE + scanning radio, max MR 30.x, End-of-Support Jul 21 2026) plus one MR18 (no role). `meraki_inventory.py` written, not yet run.
+- **Meraki (lab):** one MR33 per site — Aparta AP at Site A and AP Pool JoTe at Quinta JoTe (likely MR33, to confirm) — (BLE + scanning radio, max MR 30.x, End-of-Support Jul 21 2026), plus the Rancho AP MR18 at Site A (no role). Corrected 2026-10-10 (was "2× MR33 at Site A"). `meraki_inventory.py` written, not yet run.
 - Full technical detail lives in **`pm1630-radiation-sensor.md`** (technical source of truth); code in `pm1630-ingest/` and `pm1630-bridge/`. This file is scope, direction and working style.
 
 ## Roadmap (direction as of 2026-10-10, expect this to evolve)
