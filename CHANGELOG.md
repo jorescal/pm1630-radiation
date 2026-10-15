@@ -2,6 +2,7 @@
 
 Format: `YYYY-MM-DD [origin] summary`. Origin is `hub`, `section` or `import`.
 
+- 2026-10-14 [hub] Lab firewall rebuilt: the Site A inter-VLAN policy now lives in the MX Outbound table. For this section: the lab Servers VLAN (broker, `pi-pm1630`, planned `gcp-bridge`) can reach only the lab DNS/AD server among other lab VLANs, plus the Internet (HTTPS to Cloud Run unchanged). Broker traffic is same-VLAN and unaffected. No action needed here.
 - 2026-10-10 [import] Imported all 16 knowledge files and the instructions from the Claude
   Project "Radiation Sensor" (export 2026-10-10). The duplicate `claude/polismart_feature_analysis.md`
   (byte-identical) was dropped. Identifying values tokenized. `ingest/` matches the copy
